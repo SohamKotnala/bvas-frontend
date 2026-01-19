@@ -8,10 +8,14 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
- async function handleLogin(e) {
+async function handleLogin(e) {
   e.preventDefault();
+
   try {
-    const res = await api.post("/auth/login", { username, password });
+    const res = await api.post("/auth/login", {
+      username,
+      password,
+    });
 
     const token = res.data.token;
     saveAuth(token);
@@ -22,10 +26,12 @@ export default function Login() {
     if (role === "VENDOR") navigate("/vendor");
     else if (role === "DISTRICT_VERIFIER") navigate("/verifier");
     else navigate("/hq");
-  } catch {
+  } catch (err) {
+    console.error("LOGIN ERROR:", err);
     alert("Invalid credentials");
   }
 }
+
 
 
   return (
