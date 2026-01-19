@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import api from "../api/axios";
-import { logout } from "../utils/auth";
 
 export default function VerifierDashboard() {
   const [bills, setBills] = useState([]);
@@ -13,8 +12,12 @@ export default function VerifierDashboard() {
     try {
       const res = await api.get("/verifier/bills/pending");
       setBills(res.data);
-    } catch {
-      alert("Failed to load pending bills");
+    } catch (err) {
+      console.error("LOAD PENDING BILLS ERROR:", err);
+      alert(
+        err.response?.data?.message ||
+          "Failed to load pending bills"
+      );
     } finally {
       setLoading(false);
     }
@@ -24,8 +27,12 @@ export default function VerifierDashboard() {
     try {
       const res = await api.get(`/vendor/bills/${billId}`);
       setBillDetails(res.data);
-    } catch {
-      alert("Failed to load bill details");
+    } catch (err) {
+      console.error("LOAD BILL DETAILS ERROR:", err);
+      alert(
+        err.response?.data?.message ||
+          "Failed to load bill details"
+      );
     }
   }
 
@@ -38,8 +45,9 @@ export default function VerifierDashboard() {
       await api.post(`/verifier/bills/${id}/action`, {
         action: "APPROVE",
       });
-      alert("Bill approved");
+      alert("Bill approved successfully");
       setExpandedBill(null);
+      setBillDetails(null);
       loadBills();
     } catch (err) {
       alert(err.response?.data?.message || "Approval failed");
@@ -59,7 +67,8 @@ export default function VerifierDashboard() {
         action: "REJECT",
         remarks,
       });
-      alert("Bill rejected");
+
+      alert("Bill rejected successfully");
 
       setRemarksMap((prev) => {
         const copy = { ...prev };
@@ -68,15 +77,11 @@ export default function VerifierDashboard() {
       });
 
       setExpandedBill(null);
+      setBillDetails(null);
       loadBills();
     } catch (err) {
       alert(err.response?.data?.message || "Rejection failed");
     }
-  }
-
-  function handleLogout() {
-    logout();
-    window.location.href = "/";
   }
 
   return (
@@ -94,43 +99,28 @@ export default function VerifierDashboard() {
           <table>
             <thead>
               <tr>
-                <th style={{ textAlign: "left" }}>ID</th>
-                <th style={{ textAlign: "center" }}>Month</th>
-                <th style={{ textAlign: "right" }}>Year</th>
-                <th style={{ textAlign: "left" }}>Vendor</th>
-                <th style={{ textAlign: "center" }}>Rejections</th>
-                <th style={{ textAlign: "left" }}>Vendor Remark</th>
-                <th style={{ textAlign: "left" }}>Actions</th>
+                <th>ID</th>
+                <th>Month</th>
+                <th>Year</th>
+                <th>Vendor</th>
+                <th>Rejections</th>
+                <th>Vendor Remark</th>
+                <th>Actions</th>
               </tr>
             </thead>
 
             <tbody>
               {bills.map((b) => (
-                <>
-                  <tr key={b.id}>
-                    <td style={{ textAlign: "left" }}>{b.id}</td>
-                    <td style={{ textAlign: "center" }}>{b.month}</td>
-                    <td style={{ textAlign: "right" }}>{b.year}</td>
-                    <td style={{ textAlign: "left" }}>{b.vendor_name}</td>
-                    <td style={{ textAlign: "center" }}>
-                      {b.rejection_count ?? 0} / 5
-                    </td>
-                    <td style={{ textAlign: "left" }}>
-                      {b.latest_vendor_remark ? (
-                        b.latest_vendor_remark
-                      ) : (
-                        <em>—</em>
-                      )}
-                    </td>
+                <tbody key={b.id}>
+                  <tr>
+                    <td>{b.id}</td>
+                    <td>{b.month}</td>
+                    <td>{b.year}</td>
+                    <td>{b.vendor_name}</td>
+                    <td>{b.rejection_count ?? 0} / 5</td>
+                    <td>{b.latest_vendor_remark || <em>—</em>}</td>
                     <td>
-                      {/* View + Approve */}
-                      <div
-                        style={{
-                          display: "flex",
-                          gap: "8px",
-                          marginBottom: "8px",
-                        }}
-                      >
+                      <div style={{ marginBottom: "8px" }}>
                         <button
                           className="btn btn-secondary"
                           onClick={async () => {
@@ -151,19 +141,13 @@ export default function VerifierDashboard() {
                         <button
                           className="btn btn-approve"
                           onClick={() => approveBill(b.id)}
+                          style={{ marginLeft: "8px" }}
                         >
                           Approve
                         </button>
                       </div>
 
-                      {/* Reject + Remarks */}
-                      <div
-                        style={{
-                          display: "flex",
-                          gap: "8px",
-                          alignItems: "center",
-                        }}
-                      >
+                      <div style={{ display: "flex", gap: "8px" }}>
                         <input
                           type="text"
                           placeholder="Rejection remarks"
@@ -174,10 +158,6 @@ export default function VerifierDashboard() {
                               [b.id]: e.target.value,
                             }))
                           }
-                          style={{
-                            flex: 1,
-                            padding: "6px",
-                          }}
                         />
 
                         <button
@@ -190,64 +170,43 @@ export default function VerifierDashboard() {
                     </td>
                   </tr>
 
-                  {/* EXPANDED BILL DETAILS */}
                   {expandedBill === b.id && billDetails && (
                     <tr>
                       <td colSpan="7">
                         <div className="section">
-                          <h2>Bill Items (EPOS vs Vendor)</h2>
+                          <h2>Bill Items</h2>
 
-                          <table>
-                            <thead>
-                              <tr>
-                                <th style={{ textAlign: "left" }}>
-                                  Commodity
-                                </th>
-                                <th style={{ textAlign: "right" }}>
-                                  Vendor Qty
-                                </th>
-                                <th style={{ textAlign: "center" }}>Unit</th>
-                                <th style={{ textAlign: "right" }}>
-                                  EPOS Qty
-                                </th>
-                                <th style={{ textAlign: "right" }}>
-                                  Difference
-                                </th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {billDetails.items.length === 0 ? (
+                          {billDetails.items.length === 0 ? (
+                            <p>No items</p>
+                          ) : (
+                            <table>
+                              <thead>
                                 <tr>
-                                  <td colSpan="5">No items</td>
+                                  <th>Commodity</th>
+                                  <th>Vendor Qty</th>
+                                  <th>Unit</th>
+                                  <th>EPOS Qty</th>
+                                  <th>Difference</th>
                                 </tr>
-                              ) : (
-                                billDetails.items.map((i) => (
+                              </thead>
+                              <tbody>
+                                {billDetails.items.map((i) => (
                                   <tr key={i.id}>
-                                    <td style={{ textAlign: "left" }}>
-                                      {i.commodity}
-                                    </td>
-                                    <td style={{ textAlign: "right" }}>
-                                      {i.vendor_quantity}
-                                    </td>
-                                    <td style={{ textAlign: "center" }}>
-                                      {i.unit}
-                                    </td>
-                                    <td style={{ textAlign: "right" }}>
-                                      {i.epos_quantity}
-                                    </td>
-                                    <td style={{ textAlign: "right" }}>
-                                      {i.difference}
-                                    </td>
+                                    <td>{i.commodity}</td>
+                                    <td>{i.vendor_quantity}</td>
+                                    <td>{i.unit}</td>
+                                    <td>{i.epos_quantity}</td>
+                                    <td>{i.difference}</td>
                                   </tr>
-                                ))
-                              )}
-                            </tbody>
-                          </table>
+                                ))}
+                              </tbody>
+                            </table>
+                          )}
                         </div>
                       </td>
                     </tr>
                   )}
-                </>
+                </tbody>
               ))}
             </tbody>
           </table>

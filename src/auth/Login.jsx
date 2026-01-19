@@ -6,33 +6,49 @@ import { useNavigate, Link } from "react-router-dom";
 export default function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
 
-async function handleLogin(e) {
-  e.preventDefault();
+  async function handleLogin(e) {
+    e.preventDefault();
 
-  try {
-    const res = await api.post("/auth/login", {
-      username,
-      password,
-    });
+    if (!username || !password) {
+      alert("Please enter username and password");
+      return;
+    }
 
-    const token = res.data.token;
-    saveAuth(token);
+    setLoading(true);
 
-    const payload = JSON.parse(atob(token.split(".")[1]));
-    const role = payload.role;
+    try {
+      const res = await api.post("/auth/login", {
+        username,
+        password,
+      });
 
-    if (role === "VENDOR") navigate("/vendor");
-    else if (role === "DISTRICT_VERIFIER") navigate("/verifier");
-    else navigate("/hq");
-  } catch (err) {
-    console.error("LOGIN ERROR:", err);
-    alert("Invalid credentials");
+      const token = res.data.token;
+      saveAuth(token);
+
+      // Decode JWT payload safely
+      const payload = JSON.parse(atob(token.split(".")[1]));
+      const role = payload.role;
+
+      alert("Login successful");
+
+      if (role === "VENDOR") navigate("/vendor");
+      else if (role === "DISTRICT_VERIFIER") navigate("/verifier");
+      else navigate("/hq");
+    } catch (err) {
+      console.error("LOGIN ERROR:", err);
+
+      const message =
+        err.response?.data?.message || "Invalid username or password";
+
+      alert(message);
+    } finally {
+      setLoading(false);
+    }
   }
-}
-
-
 
   return (
     <div
@@ -54,12 +70,7 @@ async function handleLogin(e) {
           border: "1px solid #d0d7de",
         }}
       >
-        <h2
-          style={{
-            textAlign: "center",
-            marginBottom: "20px",
-          }}
-        >
+        <h2 style={{ textAlign: "center", marginBottom: "20px" }}>
           BVAS Login
         </h2>
 
@@ -103,8 +114,9 @@ async function handleLogin(e) {
           type="submit"
           className="btn btn-primary"
           style={{ width: "100%" }}
+          disabled={loading}
         >
-          Login
+          {loading ? "Logging in..." : "Login"}
         </button>
 
         <p

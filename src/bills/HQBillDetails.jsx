@@ -11,8 +11,12 @@ export default function HQBillDetails() {
     try {
       const res = await api.get(`/hq/bills/${billId}`);
       setData(res.data);
-    } catch {
-      alert("Failed to load bill details");
+    } catch (err) {
+      console.error("HQ BILL LOAD ERROR:", err);
+      alert(
+        err.response?.data?.message ||
+          "Failed to load bill details"
+      );
     }
   }
 
@@ -25,10 +29,13 @@ export default function HQBillDetails() {
 
     try {
       await api.post(`/hq/bills/${billId}/unlock`);
-      alert("Bill unlocked");
+      alert("Bill unlocked successfully");
       loadBill();
-    } catch {
-      alert("Failed to unlock bill");
+    } catch (err) {
+      alert(
+        err.response?.data?.message ||
+          "Failed to unlock bill"
+      );
     }
   }
 
@@ -40,6 +47,9 @@ export default function HQBillDetails() {
     <div>
       <h1 className="page-title">HQ Bill Details</h1>
 
+      {/* ===============================
+          BILL SUMMARY
+      ================================ */}
       <div className="section">
         <p><strong>Bill ID:</strong> {bill.id}</p>
         <p><strong>Vendor:</strong> {bill.vendor_name}</p>
@@ -49,6 +59,9 @@ export default function HQBillDetails() {
         <p><strong>Locked:</strong> {bill.is_locked ? "Yes" : "No"}</p>
       </div>
 
+      {/* ===============================
+          BILL ITEMS
+      ================================ */}
       <div className="section">
         <h2>Items</h2>
 
@@ -65,10 +78,12 @@ export default function HQBillDetails() {
               </tr>
             </thead>
             <tbody>
-              {items.map((i, idx) => (
-                <tr key={idx}>
+              {items.map((i) => (
+                <tr key={i.id}>
                   <td>{i.commodity}</td>
-                  <td>{i.vendor_quantity} {i.unit}</td>
+                  <td>
+                    {i.vendor_quantity} {i.unit}
+                  </td>
                   <td>{i.epos_quantity}</td>
                   <td>{i.difference}</td>
                 </tr>
@@ -78,6 +93,9 @@ export default function HQBillDetails() {
         )}
       </div>
 
+      {/* ===============================
+          AUDIT TRAIL
+      ================================ */}
       <div className="section">
         <h2>Audit Trail</h2>
 
@@ -94,9 +112,11 @@ export default function HQBillDetails() {
               </tr>
             </thead>
             <tbody>
-              {actions.map((a, idx) => (
-                <tr key={idx}>
-                  <td>{new Date(a.created_at).toLocaleString()}</td>
+              {actions.map((a) => (
+                <tr key={a.created_at}>
+                  <td>
+                    {new Date(a.created_at).toLocaleString()}
+                  </td>
                   <td>{a.role}</td>
                   <td>{a.action}</td>
                   <td>{a.remarks || "—"}</td>
@@ -107,11 +127,17 @@ export default function HQBillDetails() {
         )}
       </div>
 
+      {/* ===============================
+          HQ ACTIONS
+      ================================ */}
       <div className="section">
         <h2>HQ Actions</h2>
 
         {bill.is_locked ? (
-          <button className="btn btn-approve" onClick={unlockBill}>
+          <button
+            className="btn btn-approve"
+            onClick={unlockBill}
+          >
             Unlock Bill
           </button>
         ) : (
@@ -119,7 +145,10 @@ export default function HQBillDetails() {
         )}
       </div>
 
-      <button className="btn btn-secondary" onClick={() => navigate("/hq")}>
+      <button
+        className="btn btn-secondary"
+        onClick={() => navigate("/hq")}
+      >
         Back
       </button>
     </div>

@@ -4,7 +4,8 @@ import { getUser } from "../utils/auth";
 export default function ProtectedRoute({ children, role }) {
   const user = getUser();
 
-  if (!user) {
+  // 🔒 Absolute guards
+  if (!user || !user.role) {
     return <Navigate to="/" replace />;
   }
 

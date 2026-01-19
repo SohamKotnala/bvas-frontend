@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import api from "../api/axios";
-import { logout } from "../utils/auth";
 import { useNavigate } from "react-router-dom";
 
 export default function HQDashboard() {
@@ -17,7 +16,11 @@ export default function HQDashboard() {
       setSummary(summaryRes.data);
       setBills(billsRes.data);
     } catch (err) {
-      alert("Failed to load HQ dashboard data");
+      console.error("HQ DASHBOARD LOAD ERROR:", err);
+      alert(
+        err.response?.data?.message ||
+          "Failed to load HQ dashboard data"
+      );
     } finally {
       setLoading(false);
     }
@@ -51,11 +54,6 @@ export default function HQDashboard() {
     } catch (err) {
       alert(err.response?.data?.message || "Failed to unlock bill");
     }
-  }
-
-  function handleLogout() {
-    logout();
-    window.location.href = "/";
   }
 
   if (loading) return <p>Loading HQ dashboard...</p>;
@@ -145,17 +143,11 @@ export default function HQDashboard() {
                       {b.status}
                     </span>
                   </td>
-                  <td>{(b.rejection_count ?? 0)} / 5</td>
+                  <td>{b.rejection_count ?? 0} / 5</td>
                   <td>{b.verifier_name || "—"}</td>
                   <td>{b.is_locked ? "Yes" : "No"}</td>
                   <td>
-                    <div
-                      style={{
-                        display: "flex",
-                        gap: "8px",
-                        justifyContent: "center",
-                      }}
-                    >
+                    <div style={{ display: "flex", gap: "8px" }}>
                       <button
                         className="btn btn-secondary"
                         onClick={() => navigate(`/hq/bills/${b.id}`)}

@@ -19,6 +19,7 @@ const DISTRICTS = [
 
 export default function Signup() {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
 
   const [form, setForm] = useState({
     username: "",
@@ -40,12 +41,22 @@ export default function Signup() {
       return;
     }
 
+    setLoading(true);
+
     try {
       await api.post("/auth/signup", form);
+
       alert("User created successfully. Please login.");
       navigate("/");
-    } catch {
-      alert("Signup failed");
+    } catch (err) {
+      console.error("SIGNUP ERROR:", err);
+
+      const message =
+        err.response?.data?.message || "Signup failed. Try again.";
+
+      alert(message);
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -141,7 +152,7 @@ export default function Signup() {
           </select>
         </div>
 
-        {/* District (Conditional) */}
+        {/* District */}
         {form.role === "DISTRICT_VERIFIER" && (
           <div style={{ marginBottom: "18px" }}>
             <label style={{ fontSize: "13px", fontWeight: "600" }}>
@@ -176,8 +187,9 @@ export default function Signup() {
           type="submit"
           className="btn btn-primary"
           style={{ width: "100%" }}
+          disabled={loading}
         >
-          Create User
+          {loading ? "Creating user..." : "Create User"}
         </button>
 
         <p

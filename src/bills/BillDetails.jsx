@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import api from "../api/axios";
+import { logout } from "../utils/auth";
 
 const UNITS = ["kg", "quintal", "tonne", "litre", "bag", "packet"];
 
@@ -22,8 +23,14 @@ export default function BillDetails({ billId, onBack }) {
       setItems(res.data.items || []);
       setRejectionDisplay(res.data.rejection_display || null);
       setLatestVerifierRemark(res.data.latest_verifier_remark || null);
-    } catch {
+    } catch (err) {
+      console.error("LOAD BILL ERROR:", err);
       alert("Failed to load bill details");
+
+      if (err.response?.status === 401) {
+        logout();
+        window.location.href = "/";
+      }
     }
   }
 
@@ -37,7 +44,6 @@ export default function BillDetails({ billId, onBack }) {
   const canDeleteSingle = canAddItems;
   const canClearItems = status === "REJECTED";
   const canSubmit = status === "DRAFT";
-  const canResubmit = status === "REJECTED";
 
   async function addItem(e) {
     e.preventDefault();
@@ -59,6 +65,8 @@ export default function BillDetails({ billId, onBack }) {
         ],
       });
 
+      alert("Item added successfully");
+
       setCommodity("");
       setQuantity("");
       setUnit("kg");
@@ -76,9 +84,10 @@ export default function BillDetails({ billId, onBack }) {
 
     try {
       await api.delete(`/vendor/bills/${billId}/items/${itemId}`);
+      alert("Item deleted successfully");
       loadBill();
-    } catch {
-      alert("Failed to delete item");
+    } catch (err) {
+      alert(err.response?.data?.message || "Failed to delete item");
     }
   }
 
@@ -88,24 +97,25 @@ export default function BillDetails({ billId, onBack }) {
 
     try {
       await api.delete(`/vendor/bills/${billId}/items`);
+      alert("All items cleared");
       loadBill();
-    } catch {
-      alert("Failed to clear items");
+    } catch (err) {
+      alert(err.response?.data?.message || "Failed to clear items");
     }
   }
 
   async function submitBill() {
     if (items.length === 0) {
-      alert("Add at least one item");
+      alert("Add at least one item before submitting");
       return;
     }
 
     try {
       await api.post(`/vendor/bills/${billId}/submit`);
       alert("Bill submitted for verification");
-      window.location.reload();
-    } catch {
-      alert("Failed to submit bill");
+      loadBill();
+    } catch (err) {
+      alert(err.response?.data?.message || "Failed to submit bill");
     }
   }
 
@@ -119,10 +129,11 @@ export default function BillDetails({ billId, onBack }) {
       await api.post(`/vendor/bills/${billId}/resubmit`, {
         remarks: remarks || null,
       });
-      alert("Bill resubmitted");
-      window.location.reload();
-    } catch {
-      alert("Failed to resubmit bill");
+      alert("Bill resubmitted successfully");
+      setRemarks("");
+      loadBill();
+    } catch (err) {
+      alert(err.response?.data?.message || "Failed to resubmit bill");
     }
   }
 
@@ -130,9 +141,7 @@ export default function BillDetails({ billId, onBack }) {
     <div>
       <h1 className="page-title">Bill Details</h1>
 
-      {/* ===============================
-          BILL SUMMARY
-      ================================ */}
+      {/* BILL SUMMARY */}
       <div className="section">
         <p><strong>Bill ID:</strong> {billId}</p>
         <p><strong>Status:</strong> {status}</p>
@@ -149,9 +158,7 @@ export default function BillDetails({ billId, onBack }) {
         )}
       </div>
 
-      {/* ===============================
-          ADD ITEM
-      ================================ */}
+      {/* ADD ITEM */}
       <div className="section">
         <h2>Add Item</h2>
 
@@ -202,9 +209,7 @@ export default function BillDetails({ billId, onBack }) {
         </form>
       </div>
 
-      {/* ===============================
-          ITEMS TABLE
-      ================================ */}
+      {/* ITEMS */}
       <div className="section">
         <h2>Items</h2>
 
@@ -243,17 +248,12 @@ export default function BillDetails({ billId, onBack }) {
         )}
       </div>
 
-      {/* ===============================
-          REJECTED FLOW
-      ================================ */}
+      {/* REJECTED FLOW */}
       {canClearItems && (
         <div className="section">
           <h2>Resubmission</h2>
 
-          <button
-            className="btn btn-secondary"
-            onClick={clearAllItems}
-          >
+          <button className="btn btn-secondary" onClick={clearAllItems}>
             Clear All Items
           </button>
 
@@ -269,24 +269,16 @@ export default function BillDetails({ billId, onBack }) {
 
           <br /><br />
 
-          <button
-            className="btn btn-primary"
-            onClick={resubmitBill}
-          >
+          <button className="btn btn-primary" onClick={resubmitBill}>
             Resubmit Bill
           </button>
         </div>
       )}
 
-      {/* ===============================
-          DRAFT FLOW
-      ================================ */}
+      {/* DRAFT FLOW */}
       {canSubmit && (
         <div className="section">
-          <button
-            className="btn btn-primary"
-            onClick={submitBill}
-          >
+          <button className="btn btn-primary" onClick={submitBill}>
             Submit Bill
           </button>
         </div>

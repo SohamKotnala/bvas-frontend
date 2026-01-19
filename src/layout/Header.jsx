@@ -1,9 +1,7 @@
-import { getUser, logout } from "../utils/auth";
 import "./layout.css";
+import { logout } from "../utils/auth";
 
-export default function Header() {
-  const user = getUser();
-
+export default function Header({ user }) {
   function handleLogout() {
     logout();
     window.location.href = "/";
@@ -16,9 +14,13 @@ export default function Header() {
       </div>
 
       <div className="header-right">
-        {user?.username && (
+        {user && (
           <span style={{ marginRight: "12px" }}>
-            Logged in as <strong>{user.username}</strong>
+            Logged in as{" "}
+            <strong>
+              {user.role}
+              {user.district_code ? ` (${user.district_code})` : ""}
+            </strong>
           </span>
         )}
 
