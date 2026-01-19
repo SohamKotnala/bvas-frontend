@@ -1,7 +1,11 @@
 import { NavLink } from "react-router-dom";
+import { getUser } from "../utils/auth";
 import "./layout.css";
 
-export default function Sidebar({ user }) {
+export default function Sidebar() {
+  const user = getUser();
+  if (!user) return null;
+
   const role = user.role;
 
   return (
@@ -9,9 +13,6 @@ export default function Sidebar({ user }) {
       <div className="sidebar-section">
         <div className="sidebar-title">Navigation</div>
 
-        {/* ===================== */}
-        {/* Vendor Menu */}
-        {/* ===================== */}
         {role === "VENDOR" && (
           <ul className="sidebar-menu">
             <li>
@@ -22,9 +23,6 @@ export default function Sidebar({ user }) {
           </ul>
         )}
 
-        {/* ===================== */}
-        {/* District Verifier Menu */}
-        {/* ===================== */}
         {role === "DISTRICT_VERIFIER" && (
           <ul className="sidebar-menu">
             <li>
@@ -35,9 +33,6 @@ export default function Sidebar({ user }) {
           </ul>
         )}
 
-        {/* ===================== */}
-        {/* HQ Admin Menu */}
-        {/* ===================== */}
         {role === "HQ_ADMIN" && (
           <ul className="sidebar-menu">
             <li>
