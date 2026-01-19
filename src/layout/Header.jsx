@@ -1,45 +1,24 @@
-import { useNavigate } from "react-router-dom";
+import { logout } from "../utils/auth";
 import "./layout.css";
 
-export default function Header() {
-  const navigate = useNavigate();
-
-  export default function Header({ user }) {
-  return (
-    <header>
-      <span>Welcome, {user.username}</span>
-      {/* rest of header */}
-    </header>
-  );
-}
-
-
-  const handleLogout = () => {
-    localStorage.clear();
-    navigate("/");
-  };
-
-  const getRoleLabel = () => {
-    if (!user?.role) return "";
-    if (user.role === "VENDOR") return "Vendor";
-    if (user.role === "DISTRICT_VERIFIER") return "District Verifier";
-    if (user.role === "HQ_ADMIN") return "HQ Admin";
-    return user.role;
-  };
+export default function Header({ user }) {
+  function handleLogout() {
+    logout();
+    window.location.href = "/";
+  }
 
   return (
     <header className="app-header">
       <div className="header-left">
-        <span className="app-title">Bill Verification System</span>
+        <strong>BVAS</strong>
       </div>
 
       <div className="header-right">
-        <div className="user-info">
-          <span className="user-name">{user?.name || "User"}</span>
-          <span className="user-role">{getRoleLabel()}</span>
-        </div>
+        <span className="header-username">
+          {user.username} ({user.role})
+        </span>
 
-        <button className="logout-btn" onClick={handleLogout}>
+        <button className="btn btn-secondary" onClick={handleLogout}>
           Logout
         </button>
       </div>

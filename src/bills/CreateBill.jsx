@@ -14,7 +14,6 @@ const DISTRICTS = [
   { code: "UKRU", name: "Rudraprayag" },
   { code: "UKTE", name: "Tehri Garhwal" },
   { code: "UKUT", name: "Uttarkashi" },
-  { code: "UKCHP", name: "Champawat" },
 ];
 
 export default function CreateBill({ onCreated }) {
@@ -50,8 +49,8 @@ export default function CreateBill({ onCreated }) {
       setYear("");
       setDistrict("");
       onCreated();
-    } catch (err) {
-     
+    } catch (error) {
+      alert(error.response?.data?.message || "Failed to create bill");
     } finally {
       setLoading(false);
     }
@@ -70,48 +69,32 @@ export default function CreateBill({ onCreated }) {
           alignItems: "end",
         }}
       >
-        {/* Month */}
         <div>
-          <label style={{ fontSize: "13px", fontWeight: "600" }}>
-            Month
-          </label>
+          <label>Month</label>
           <input
             type="number"
-            placeholder="1–12"
             value={month}
             onChange={(e) => setMonth(e.target.value)}
-            min="1"
-            max="12"
             required
-            style={{ width: "100%", padding: "8px", marginTop: "4px" }}
           />
         </div>
 
-        {/* Year */}
         <div>
-          <label style={{ fontSize: "13px", fontWeight: "600" }}>
-            Year
-          </label>
+          <label>Year</label>
           <input
             type="number"
-            placeholder="Year"
             value={year}
             onChange={(e) => setYear(e.target.value)}
             required
-            style={{ width: "100%", padding: "8px", marginTop: "4px" }}
           />
         </div>
 
-        {/* District */}
         <div>
-          <label style={{ fontSize: "13px", fontWeight: "600" }}>
-            District
-          </label>
+          <label>District</label>
           <select
             value={district}
             onChange={(e) => setDistrict(e.target.value)}
             required
-            style={{ width: "100%", padding: "8px", marginTop: "4px" }}
           >
             <option value="">Select District</option>
             {DISTRICTS.map((d) => (
@@ -122,13 +105,7 @@ export default function CreateBill({ onCreated }) {
           </select>
         </div>
 
-        {/* Submit */}
-        <button
-          type="submit"
-          className="btn btn-primary"
-          disabled={loading}
-          style={{ height: "38px" }}
-        >
+        <button type="submit" disabled={loading}>
           {loading ? "Creating..." : "Create Bill"}
         </button>
       </form>
