@@ -5,7 +5,7 @@ const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
 });
 
-// ✅ ATTACH TOKEN TO EVERY REQUEST
+/* 🔐 AUTO ATTACH JWT */
 api.interceptors.request.use(
   (config) => {
     const token = getToken();
