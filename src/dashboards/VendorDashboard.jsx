@@ -10,30 +10,12 @@ export default function VendorDashboard() {
   const [selectedBill, setSelectedBill] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  async function loadBills(showSuccess = false) {
-    setLoading(true);
-
+  async function loadBills() {
     try {
       const res = await api.get("/vendor/bills");
       setBills(res.data);
-
-      if (showSuccess) {
-        alert("Bills refreshed successfully");
-      }
     } catch (err) {
-      console.error("LOAD BILLS ERROR:", err);
-
-      const message =
-        err.response?.data?.message ||
-        "Failed to load bills. Please try again.";
-
-      alert(message);
-
-      // Token expired / invalid → force logout
-      if (err.response?.status === 401) {
-        logout();
-        window.location.href = "/";
-      }
+      alert("Failed to load bills");
     } finally {
       setLoading(false);
     }
@@ -57,7 +39,7 @@ export default function VendorDashboard() {
         billId={selectedBill}
         onBack={() => {
           setSelectedBill(null);
-          loadBills(true);
+          loadBills();
         }}
       />
     );
@@ -92,9 +74,8 @@ export default function VendorDashboard() {
           <div style={{ marginTop: "16px" }}>
             <CreateBill
               onCreated={() => {
-                alert("Bill created successfully");
                 setShowCreate(false);
-                loadBills(true);
+                loadBills();
               }}
             />
           </div>
@@ -148,11 +129,6 @@ export default function VendorDashboard() {
           </table>
         )}
       </div>
-
-      {/* Optional logout button if needed */}
-      {/* <button className="btn btn-danger" onClick={handleLogout}>
-        Logout
-      </button> */}
     </div>
   );
 }

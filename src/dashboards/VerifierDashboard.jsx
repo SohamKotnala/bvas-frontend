@@ -64,7 +64,7 @@ export default function VerifierDashboard() {
 
     try {
       await api.post(`/verifier/bills/${id}/action`, {
-        action: "REJECT",
+        action: "REJECTED",
         remarks,
       });
 
