@@ -50,8 +50,8 @@ export default function CreateBill({ onCreated }) {
       setYear("");
       setDistrict("");
       onCreated();
-    } catch (_err) {
-      alert(err.response?.data?.message || "Failed to create bill");
+    } catch (err) {
+     
     } finally {
       setLoading(false);
     }

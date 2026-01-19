@@ -16,7 +16,7 @@ export default function HQDashboard() {
 
       setSummary(summaryRes.data);
       setBills(billsRes.data);
-    } catch (_err) {
+    } catch (err) {
       alert("Failed to load HQ dashboard data");
     } finally {
       setLoading(false);

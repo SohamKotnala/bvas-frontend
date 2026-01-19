@@ -15,7 +15,7 @@ export default function HQBillDetails() {
     try {
       const res = await api.get(`/hq/bills/${billId}`);
       setData(res.data);
-    } catch (_err) {
+    } catch (err) {
       alert("Failed to load bill details");
     }
   }

@@ -14,7 +14,7 @@ export default function VendorDashboard() {
     try {
       const res = await api.get("/vendor/bills");
       setBills(res.data);
-    } catch (_err) {
+    } catch (err) {
       alert("Failed to load bills");
     } finally {
       setLoading(false);

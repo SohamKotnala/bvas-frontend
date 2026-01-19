@@ -8,20 +8,25 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-  async function handleLogin(e) {
-    e.preventDefault();
-    try {
-      const res = await api.post("/auth/login", { username, password });
-      saveAuth(res.data.token, res.data.user);
+ async function handleLogin(e) {
+  e.preventDefault();
+  try {
+    const res = await api.post("/auth/login", { username, password });
 
-      const role = res.data.user.role;
-      if (role === "VENDOR") navigate("/vendor");
-      else if (role === "DISTRICT_VERIFIER") navigate("/verifier");
-      else navigate("/hq");
-    } catch {
-      alert("Invalid credentials");
-    }
+    const token = res.data.token;
+    saveAuth(token);
+
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    const role = payload.role;
+
+    if (role === "VENDOR") navigate("/vendor");
+    else if (role === "DISTRICT_VERIFIER") navigate("/verifier");
+    else navigate("/hq");
+  } catch {
+    alert("Invalid credentials");
   }
+}
+
 
   return (
     <div
