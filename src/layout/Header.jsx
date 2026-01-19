@@ -1,27 +1,29 @@
-import { logout } from "../utils/auth";
+import { getUser, logout } from "../utils/auth";
 import "./layout.css";
 
-export default function Header({ user }) {
-  function handleLogout() {
-    logout();
-    window.location.href = "/";
+export default function Header() {
+  const user = getUser();
+
+  // 🔒 Absolute guard
+  if (!user || !user.username) {
+    return null;
   }
 
   return (
     <header className="app-header">
-      <div className="header-left">
-        <strong>BVAS</strong>
+      <div>
+        Logged in as <strong>{user.username}</strong>
       </div>
 
-      <div className="header-right">
-        <span className="header-username">
-          {user.username} ({user.role})
-        </span>
-
-        <button className="btn btn-secondary" onClick={handleLogout}>
-          Logout
-        </button>
-      </div>
+      <button
+        className="btn btn-secondary"
+        onClick={() => {
+          logout();
+          window.location.href = "/";
+        }}
+      >
+        Logout
+      </button>
     </header>
   );
 }
