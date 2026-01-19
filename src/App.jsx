@@ -12,7 +12,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Public Routes */}
+        {/* Public */}
         <Route path="/" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
 
@@ -40,7 +40,7 @@ export default function App() {
           }
         />
 
-        {/* HQ Admin */}
+        {/* HQ */}
         <Route
           path="/hq"
           element={
@@ -52,7 +52,6 @@ export default function App() {
           }
         />
 
-        {/* HQ – Bill Details */}
         <Route
           path="/hq/bills/:billId"
           element={
