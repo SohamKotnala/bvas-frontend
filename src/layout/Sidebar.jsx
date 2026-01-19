@@ -1,10 +1,8 @@
 import { NavLink } from "react-router-dom";
 import "./layout.css";
 
-export default function Sidebar() {
-  const user = JSON.parse(localStorage.getItem("user"));
-
-  const role = user?.role;
+export default function Sidebar({ user }) {
+  const role = user.role;
 
   return (
     <aside className="app-sidebar">

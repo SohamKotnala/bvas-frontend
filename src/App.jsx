@@ -12,15 +12,11 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* ===================== */}
         {/* Public Routes */}
-        {/* ===================== */}
         <Route path="/" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
 
-        {/* ===================== */}
         {/* Vendor */}
-        {/* ===================== */}
         <Route
           path="/vendor"
           element={
@@ -32,9 +28,7 @@ export default function App() {
           }
         />
 
-        {/* ===================== */}
         {/* District Verifier */}
-        {/* ===================== */}
         <Route
           path="/verifier"
           element={
@@ -46,9 +40,7 @@ export default function App() {
           }
         />
 
-        {/* ===================== */}
         {/* HQ Admin */}
-        {/* ===================== */}
         <Route
           path="/hq"
           element={
@@ -60,9 +52,7 @@ export default function App() {
           }
         />
 
-        {/* ===================== */}
         {/* HQ – Bill Details */}
-        {/* ===================== */}
         <Route
           path="/hq/bills/:billId"
           element={

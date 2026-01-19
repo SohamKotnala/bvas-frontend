@@ -4,7 +4,15 @@ import "./layout.css";
 export default function Header() {
   const navigate = useNavigate();
 
-  const user = JSON.parse(localStorage.getItem("user"));
+  export default function Header({ user }) {
+  return (
+    <header>
+      <span>Welcome, {user.username}</span>
+      {/* rest of header */}
+    </header>
+  );
+}
+
 
   const handleLogout = () => {
     localStorage.clear();
