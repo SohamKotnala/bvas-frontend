@@ -110,105 +110,104 @@ export default function VerifierDashboard() {
             </thead>
 
             <tbody>
-              {bills.map((b) => (
-                <tbody key={b.id}>
-                  <tr>
-                    <td>{b.id}</td>
-                    <td>{b.month}</td>
-                    <td>{b.year}</td>
-                    <td>{b.vendor_name}</td>
-                    <td>{b.rejection_count ?? 0} / 5</td>
-                    <td>{b.latest_vendor_remark || <em>—</em>}</td>
-                    <td>
-                      <div style={{ marginBottom: "8px" }}>
-                        <button
-                          className="btn btn-secondary"
-                          onClick={async () => {
-                            if (expandedBill === b.id) {
-                              setExpandedBill(null);
-                              setBillDetails(null);
-                            } else {
-                              setExpandedBill(b.id);
-                              await loadBillDetails(b.id);
-                            }
-                          }}
-                        >
-                          {expandedBill === b.id
-                            ? "Hide Details"
-                            : "View Details"}
-                        </button>
+  {bills.map((b) => (
+    <>
+      <tr key={`row-${b.id}`}>
+        <td>{b.id}</td>
+        <td>{b.month}</td>
+        <td>{b.year}</td>
+        <td>{b.vendor_name}</td>
+        <td>{b.rejection_count ?? 0} / 5</td>
+        <td>{b.latest_vendor_remark || <em>—</em>}</td>
+        <td>
+          <div style={{ marginBottom: "8px" }}>
+            <button
+              className="btn btn-secondary"
+              onClick={async () => {
+                if (expandedBill === b.id) {
+                  setExpandedBill(null);
+                  setBillDetails(null);
+                } else {
+                  setExpandedBill(b.id);
+                  await loadBillDetails(b.id);
+                }
+              }}
+            >
+              {expandedBill === b.id ? "Hide Details" : "View Details"}
+            </button>
 
-                        <button
-                          className="btn btn-approve"
-                          onClick={() => approveBill(b.id)}
-                          style={{ marginLeft: "8px" }}
-                        >
-                          Approve
-                        </button>
-                      </div>
+            <button
+              className="btn btn-approve"
+              onClick={() => approveBill(b.id)}
+              style={{ marginLeft: "8px" }}
+            >
+              Approve
+            </button>
+          </div>
 
-                      <div style={{ display: "flex", gap: "8px" }}>
-                        <input
-                          type="text"
-                          placeholder="Rejection remarks"
-                          value={remarksMap[b.id] || ""}
-                          onChange={(e) =>
-                            setRemarksMap((prev) => ({
-                              ...prev,
-                              [b.id]: e.target.value,
-                            }))
-                          }
-                        />
+          <div style={{ display: "flex", gap: "8px" }}>
+            <input
+              type="text"
+              placeholder="Rejection remarks"
+              value={remarksMap[b.id] || ""}
+              onChange={(e) =>
+                setRemarksMap((prev) => ({
+                  ...prev,
+                  [b.id]: e.target.value,
+                }))
+              }
+              style={{ flex: 1 }}
+            />
 
-                        <button
-                          className="btn btn-reject"
-                          onClick={() => rejectBill(b.id)}
-                        >
-                          Reject
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
+            <button
+              className="btn btn-reject"
+              onClick={() => rejectBill(b.id)}
+            >
+              Reject
+            </button>
+          </div>
+        </td>
+      </tr>
 
-                  {expandedBill === b.id && billDetails && (
+      {expandedBill === b.id && billDetails && (
+        <tr key={`details-${b.id}`}>
+          <td colSpan={7}>
+            <div className="section">
+              <h2>Bill Items</h2>
+
+              {billDetails.items.length === 0 ? (
+                <p>No items</p>
+              ) : (
+                <table style={{ width: "100%" }}>
+                  <thead>
                     <tr>
-                      <td colSpan="7">
-                        <div className="section">
-                          <h2>Bill Items</h2>
-
-                          {billDetails.items.length === 0 ? (
-                            <p>No items</p>
-                          ) : (
-                            <table>
-                              <thead>
-                                <tr>
-                                  <th>Commodity</th>
-                                  <th>Vendor Qty</th>
-                                  <th>Unit</th>
-                                  <th>EPOS Qty</th>
-                                  <th>Difference</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                {billDetails.items.map((i) => (
-                                  <tr key={i.id}>
-                                    <td>{i.commodity}</td>
-                                    <td>{i.vendor_quantity}</td>
-                                    <td>{i.unit}</td>
-                                    <td>{i.epos_quantity}</td>
-                                    <td>{i.difference}</td>
-                                  </tr>
-                                ))}
-                              </tbody>
-                            </table>
-                          )}
-                        </div>
-                      </td>
+                      <th>Commodity</th>
+                      <th>Vendor Qty</th>
+                      <th>Unit</th>
+                      <th>EPOS Qty</th>
+                      <th>Difference</th>
                     </tr>
-                  )}
-                </tbody>
-              ))}
-            </tbody>
+                  </thead>
+                  <tbody>
+                    {billDetails.items.map((i) => (
+                      <tr key={i.id}>
+                        <td>{i.commodity}</td>
+                        <td>{i.vendor_quantity}</td>
+                        <td>{i.unit}</td>
+                        <td>{i.epos_quantity}</td>
+                        <td>{i.difference}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          </td>
+        </tr>
+      )}
+    </>
+  ))}
+</tbody>
           </table>
         )}
       </div>
