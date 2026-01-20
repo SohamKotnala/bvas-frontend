@@ -16,23 +16,24 @@ export default function BillDetails({ billId, onBack }) {
   const [rejectionDisplay, setRejectionDisplay] = useState(null);
   const [latestVerifierRemark, setLatestVerifierRemark] = useState(null);
 
-  async function loadBill() {
-    try {
-      const res = await api.get(`/vendor/bills/${billId}`);
-      setBill(res.data.bill);
-      setItems(res.data.items || []);
-      setRejectionDisplay(res.data.rejection_display || null);
-      setLatestVerifierRemark(res.data.latest_verifier_remark || null);
-    } catch (err) {
-      console.error("LOAD BILL ERROR:", err);
-      alert("Failed to load bill details");
+async function loadBill() {
+  try {
+    const res = await api.get(`/vendor/bills/${billId}`);
+    setBill(res.data.bill);
+    setItems(res.data.items || []);
+    setRejectionDisplay(res.data.rejection_display || null);
+    setLatestVerifierRemark(res.data.bill?.latest_remark || null);
+  } catch (err) {
+    console.error("LOAD BILL ERROR:", err);
+    alert("Failed to load bill details");
 
-      if (err.response?.status === 401) {
-        logout();
-        window.location.href = "/";
-      }
+    if (err.response?.status === 401) {
+      logout();
+      window.location.href = "/";
     }
   }
+}
+
 
   useEffect(() => {
     loadBill();
